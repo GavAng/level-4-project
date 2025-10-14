@@ -1,8 +1,25 @@
 from typing import Literal
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from cellular_automata import GameOfLife
+
+
+@pytest.mark.parametrize(
+    "natural, shape, expected_state",
+    [
+        (0, (4, 4), np.zeros((4, 4))),
+        ((2**16) - 1, (4, 4), np.ones((4, 4))),
+    ],
+)
+def test_by_natural(
+    natural: int,
+    shape: tuple[int, int],
+    expected_state: npt.NDArray[np.int8] | list[list[Literal[0, 1]]],
+):
+    game = GameOfLife.by_natural(natural, shape)
+    assert (game.state == np.array(expected_state)).all()
 
 
 @pytest.mark.parametrize(

@@ -10,6 +10,22 @@ class GameOfLife:
     ) -> None:
         self.state = np.array(initial_state, dtype=np.int8)
 
+    @classmethod
+    def by_natural(cls, natural: int, shape: tuple[int, int]):
+        n_rows, n_cols = shape
+        if n_rows <= 0 or n_cols <= 0:
+            raise ValueError("Invalid shape.")
+        n_cells = n_rows * n_cols
+        if natural < 0 or natural >= 2**n_cells:
+            raise ValueError(
+                "natural must be between 0 and 2 ** (n_rows * n_cols) - 1 inclusive."
+            )
+        binary = bin(natural)[2:]
+        code = np.array(list(map(int, reversed(binary))))
+        code.resize(shape)
+        initial_state = code.reshape(shape)
+        return cls(initial_state)
+
     def neighbours(self, i: int, j: int) -> npt.NDArray[np.int8]:
         n_rows: int
         n_cols: int
@@ -32,11 +48,6 @@ class GameOfLife:
                 elif not live and n_live_neighbours == 3:
                     new_state[i, j] = 1
             self.state = new_state
-
-    # def __repr__(self) -> str:
-    #     return "\n".join(
-    #         "".join("X" if live else " " for live in row) for row in self.state
-    #     )
 
     def __repr__(self) -> str:
         return "\n".join("".join(row) for row in np.where(self.state == 1, "X", " "))
